@@ -1,0 +1,122 @@
+// Global style overrides
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+// Desktop-app feel: prevent web-like text selection & image dragging
+*, *::before, *::after {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+// Allow selection in editable areas and log/code content
+input, textarea,
+[contenteditable="true"],
+.v-field__input,
+.v-textarea textarea,
+.log-entry,
+.log-container,
+.mono-selectable,
+.file-tree-path,
+pre, code {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+// Prevent image/link dragging (web behavior)
+img, a {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+// Default cursor everywhere (no I-beam on labels)
+body {
+  cursor: default;
+}
+
+.v-application {
+  height: 100%;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.4);
+  border-radius: 4px;
+
+  &:hover {
+    background: rgba(128, 128, 128, 0.6);
+  }
+}
+
+// Custom utility classes
+.mono {
+  font-family: 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Desktop-compact overrides
+.v-btn {
+  text-transform: none !important;  // No uppercase (desktop convention)
+  letter-spacing: normal !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;    // Less rounded (desktop buttons)
+  min-height: 32px !important;
+}
+
+.v-btn--size-default {
+  padding: 0 12px !important;
+  font-size: 0.8125rem !important;
+}
+
+.v-btn--size-small {
+  min-height: 26px !important;
+  padding: 0 8px !important;
+}
+
+.v-btn--icon {
+  border-radius: 4px !important;
+}
+
+// Tighter cards for desktop
+.v-card {
+  border-radius: 6px !important;
+}
+
+// Compact chip styling
+.v-chip {
+  border-radius: 4px !important;
+}
+
+// Tighter tabs for desktop
+.v-tab {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  min-width: auto !important;
+  font-size: 0.8125rem !important;
+}
+
+// Progress bar animations
+.progress-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}

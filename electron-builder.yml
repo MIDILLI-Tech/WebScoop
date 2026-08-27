@@ -1,0 +1,49 @@
+appId: com.webscoop.app
+productName: WebScoop
+directories:
+  buildResources: resources
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.*'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!{README.md,CONTRIBUTING.md,LICENSE}'
+asarUnpack:
+  - resources/**
+win:
+  executableName: webscoop
+  icon: resources/icon.ico
+  signAndEditExecutable: false
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+mac:
+  icon: resources/icon.png
+  entitlementsInherit: build/entitlements.mac.plist
+  notarize: false
+  # No Apple Developer certificate -> ad-hoc sign (self-generated signature).
+  # Needed so the arm64 (Apple Silicon) build isn't rejected as "damaged".
+  identity: "-"
+  # ${arch} keeps the Intel (x64) and Apple Silicon (arm64) builds distinct.
+  artifactName: ${name}-${version}-${arch}.${ext}
+dmg:
+  artifactName: ${name}-${version}-${arch}.${ext}
+linux:
+  target:
+    - AppImage
+    - deb
+  maintainer: webscoop-contributors
+  category: Utility
+  icon: resources/icon.png
+appImage:
+  artifactName: ${name}-${version}.${ext}
+npmRebuild: false
+publish:
+  provider: github
+  owner: midilli-tech
+  repo: webscoop
