@@ -1,0 +1,48 @@
+name: Build
+
+# Verifies that the app actually compiles/builds on every push and PR
+# (the existing "CI" workflow covers lint / typecheck / tests).
+#
+# Runs the same `npm ci` + `npm run build` on all three platforms so that
+# OS-specific native-module rebuilds (better-sqlite3) are caught before the
+# release is cut.
+
+on:
+  push:
+    # Release tags are handled by release.yml; skip them here.
+    tags-ignore:
+      - 'v*'
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      # No signing certificates are configured in this repo.
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+
+      # Full install (postinstall rebuilds native modules for Electron).
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (electron-vite)
+        run: npm run build

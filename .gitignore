@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.npm
+
+# Build output
+out/
+dist/
+build/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# IDE
+.vscode/*
+!vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Electron
+release/
+
+# Misc
+
+# Runtime
+/.cache/
+/.hot-loader/
+
+# Temp backups (logo processing)
+/logo-backup/
