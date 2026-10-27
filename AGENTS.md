@@ -133,3 +133,19 @@ TypeScript 7 is not currently supported by `vue-tsc` and `typescript-eslint` in 
 ## Native Modules
 
 `better-sqlite3` is rebuilt for Electron automatically during `npm install` through `electron-builder install-app-deps`. No manual rebuild step is normally required.
+
+## Troubleshooting
+
+- **`npm run dev` fails with "Electron uninstall"**: Electron's binary was not downloaded. This can happen when npm's `allowScripts` blocks Electron's postinstall script. Run:
+
+```sh
+node node_modules/electron/install.js
+```
+
+Then retry:
+
+```sh
+npm run dev
+```
+
+Ensure `package.json` contains the matching `electron@<version>` entry in `allowScripts`.

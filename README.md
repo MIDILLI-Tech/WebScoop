@@ -220,7 +220,8 @@ Typical paths:
 - **"No Chromium installation found" during a crawl** — Set the browser path manually in Settings (section above), make sure JS Rendering is enabled in the project's config, and save before starting.
 - **Tray icon not showing on Linux** — Your desktop environment must support the StatusNotifierItem/AppIndicator protocol (GNOME needs an extension such as AppIndicator support). Without it, closing the window will simply quit the app.
 - **Some pages look broken offline** — Sites loading assets from third-party domains may need *Domain Restriction* set to "Any domain" in the project filters so those assets get mirrored too.
-- **Build fails with a Node version warning** — This project targets Node.js 24 LTS; older versions are unsupported.
+- **Build fails with a Node version warning** - This project targets Node.js 24 LTS; older versions are unsupported.
+- **`npm run dev` fails with "Electron uninstall"** - Electron's binary was not downloaded. This can happen when npm's `allowScripts` blocks Electron's postinstall. Run `node node_modules/electron/install.js`, then retry `npm run dev`. The `allowScripts` entry for `electron@<version>` should also be present in `package.json`.
 - **"Update check failed" in Settings** — The app queries GitHub Releases; corporate proxies or rate limits can block it. Auto-update itself is unaffected once an installer is published.
 - **Auto-update doesn't trigger** — It only works for installed (packaged) builds published to GitHub Releases; dev builds skip it, and macOS builds must be signed and notarized.
 
