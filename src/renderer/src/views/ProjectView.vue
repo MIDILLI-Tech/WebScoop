@@ -116,9 +116,12 @@
 
     <!-- Delete confirm dialog -->
     <v-dialog v-model="confirmDelete" max-width="520">
-      <v-card>
-        <v-card-title class="text-wrap text-error">{{ t('project.deleteConfirm') }}</v-card-title>
-        <v-card-text>{{ t('project.deleteHint') }}</v-card-text>
+      <v-card class="overflow-hidden">
+        <div class="d-flex align-center justify-space-between px-4 py-2 bg-error text-white">
+          <span class="text-subtitle-1 font-weight-bold text-wrap">{{ t('project.deleteConfirm') }}</span>
+          <v-btn icon="mdi-close" size="x-small" variant="text" color="white" @click="confirmDelete = false" />
+        </div>
+        <v-card-text class="pt-3">{{ t('project.deleteHint') }}</v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn @click="confirmDelete = false">{{ t('common.cancel') }}</v-btn>
@@ -129,9 +132,12 @@
 
     <!-- Unsaved changes: leave confirm dialog -->
     <v-dialog v-model="confirmLeave" max-width="400" persistent>
-      <v-card>
-        <v-card-title>{{ t('project.leaveTitle') }}</v-card-title>
-        <v-card-text>{{ t('project.leaveText') }}</v-card-text>
+      <v-card class="overflow-hidden">
+        <div class="d-flex align-center justify-space-between px-4 py-2 bg-warning text-white">
+          <span class="text-subtitle-1 font-weight-bold text-wrap">{{ t('project.leaveTitle') }}</span>
+          <v-btn icon="mdi-close" size="x-small" variant="text" color="white" @click="confirmLeave = false" />
+        </div>
+        <v-card-text class="pt-3">{{ t('project.leaveText') }}</v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn @click="confirmLeave = false">{{ t('common.cancel') }}</v-btn>
@@ -340,13 +346,12 @@ async function duplicateProject(): Promise<void> {
 }
 
 async function deleteProject(): Promise<void> {
+  confirmDelete.value = false
   try {
     await projectStore.deleteProject(projectId.value)
-    confirmDelete.value = false
     router.push('/')
   } catch (err: any) {
     actionError.value = err?.message || String(err)
-    confirmDelete.value = false
   }
 }
 
