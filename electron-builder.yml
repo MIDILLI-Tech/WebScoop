@@ -5,10 +5,17 @@ directories:
 files:
   - '!**/.vscode/*'
   - '!src/*'
+  - '!.githooks/*'
+  - '!scripts/*'
+  - '!build/*'
   - '!electron.vite.config.*'
-  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,eslint.config.*}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-  - '!{README.md,CONTRIBUTING.md,LICENSE}'
+  - '!{README.md,CONTRIBUTING.md,LICENSE,AGENTS.md,CHANGELOG.md}'
+  - '!**/*.tsbuildinfo'
+  - '!node_modules/**/*.map'
+  - '!node_modules/**/*.d.ts'
+  - '!node_modules/**/{test,tests,__tests__,docs,examples}'
 asarUnpack:
   - resources/**
 win:
