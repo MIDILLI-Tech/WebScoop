@@ -9,7 +9,7 @@
     <!-- Quick start -->
     <v-card class="mb-4 pa-3" variant="outlined">
       <div class="text-subtitle-2 mb-2">{{ t('home.quickStart') }}</div>
-      <v-row align="center" dense>
+      <v-row align="center" density="compact">
         <v-col cols="9">
           <v-text-field
             v-model="quickUrl"
@@ -38,7 +38,7 @@
     </v-card>
 
     <!-- Stats overview -->
-    <v-row dense class="mb-4">
+    <v-row density="compact" class="mb-4">
       <v-col cols="3">
         <v-card variant="tonal" color="primary" class="pa-2 text-center">
           <v-icon icon="mdi-folder-multiple" size="20" class="mb-1" />

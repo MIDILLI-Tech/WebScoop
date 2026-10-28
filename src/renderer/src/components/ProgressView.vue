@@ -1,7 +1,7 @@
 <template>
   <v-card flat class="pa-3">
     <!-- Top stats row -->
-    <v-row dense class="mb-3">
+    <v-row density="compact" class="mb-3">
       <v-col cols="3">
         <v-card variant="tonal" color="primary" class="pa-2 text-center">
           <div class="text-h6 mono">{{ stats.downloaded }}</div>
