@@ -40,8 +40,5 @@ release/
 /.cache/
 /.hot-loader/
 
-# Transient
-package-lock.json
-
 # Temp backups (logo processing)
 /logo-backup/
