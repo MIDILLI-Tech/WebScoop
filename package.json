@@ -25,7 +25,9 @@
     "test:watch": "vitest",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
     "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json",
-    "typecheck": "npm run typecheck:node && npm run typecheck:web"
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "changelog": "tsx scripts/changelog.ts",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

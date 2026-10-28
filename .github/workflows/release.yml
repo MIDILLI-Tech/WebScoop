@@ -54,6 +54,9 @@ jobs:
           node-version: 24
           cache: npm
 
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
       - name: Compute / validate version
         id: meta
         run: |
@@ -71,11 +74,14 @@ jobs:
       - name: Bump package.json & package-lock.json
         run: npm version "${{ steps.meta.outputs.version }}" --no-git-tag-version --allow-same-version
 
+      - name: Generate changelog
+        run: npm run changelog -- --version="${{ steps.meta.outputs.version }}"
+
       - name: Commit, tag and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json
+          git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): ${{ steps.meta.outputs.tag }} [skip ci]" \
             || echo "Nothing to commit"
           git tag "${{ steps.meta.outputs.tag }}"
@@ -159,10 +165,35 @@ jobs:
     if: ${{ needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.tag || github.ref }}
+          fetch-depth: 0
+
       - uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
+
+      - name: Prepare release notes
+        run: |
+          TAG="${{ needs.tag.outputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="${{ github.ref_name }}"
+          fi
+          VERSION="${TAG#v}"
+          python3 - "$VERSION" <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          try:
+              text = open('CHANGELOG.md').read()
+          except FileNotFoundError:
+              text = ''
+          pattern = rf'^## \[{re.escape(version)}\].*?(?=^## \[|\Z)'
+          m = re.search(pattern, text, re.M | re.S)
+          notes = m.group(0).strip() if m else f"Release v{version}"
+          open('release-notes.md', 'w', encoding='utf-8').write(notes + '\n')
+          PY
 
       - name: Create / update GitHub Release
         env:
@@ -180,5 +211,5 @@ jobs:
             gh release create "$TAG" dist/* \
               --repo "$REPO" \
               --title "WebScoop ${TAG}" \
-              --generate-notes
+              --notes-file release-notes.md
           fi
