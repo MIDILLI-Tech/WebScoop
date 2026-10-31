@@ -207,6 +207,14 @@ Typical paths:
 | macOS | `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` |
 | Linux | `/usr/bin/google-chrome`, `/usr/bin/chromium` |
 
+## Authentication
+
+All three methods are configured per project under **Project Settings → Authentication**:
+
+- **Interactive Login (Form Login)** — Enter the site's login URL and click **Open Login Window**. A real mini-browser window opens; sign in as you normally would (username/password, 2FA/SMS code, captcha, or Google/social login). When done, click **OK — I'm Logged In**: WebScoop automatically captures the session cookies and uses them for both HTTP downloads and the JavaScript (Puppeteer) rendering stage. Login cookies are scoped to the target site only.
+- **Cookie Import** — Paste cookies copied from your own browser directly into the field.
+- **HTTP Basic Auth** — Simple username & password, sent as the `Authorization` header.
+
 ## Where Is My Data?
 
 - **Projects, schedule state, settings, crawl logs** — SQLite database in the Electron user-data folder:
