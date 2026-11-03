@@ -2,6 +2,10 @@
 
 Open-source, cross-platform website mirroring tool for offline browsing. A modern alternative to HTTrack, WebReaper, and Cyotek WebCopy.
 
+<p align="center">
+  <img src="screenshot.png" alt="WebScoop screenshot" width="900" />
+</p>
+
 ## Features
 
 - **Full Website Mirroring** — Download entire websites with all assets for offline use
@@ -37,7 +41,7 @@ Open-source, cross-platform website mirroring tool for offline browsing. A moder
 
 ## Requirements
 
-- **Node.js 24 LTS** or newer (`node -v` to check)
+- **Node.js 26 LTS** or newer (`node -v` to check)
 - npm (bundled with Node.js)
 - Google Chrome, Chromium, or Microsoft Edge — required only for the optional JavaScript rendering feature. On Windows/macOS it is auto-detected; on exotic setups you can point WebScoop to the executable manually (see below).
 
@@ -155,7 +159,7 @@ scripts/      CLI entry — same engine, plain Node.js (no Electron needed)
 
 ## CLI Usage
 
-The crawling engine can also be used directly from the terminal — no app window, no Electron needed. It runs on a plain Node.js 24+ installation.
+The crawling engine can also be used directly from the terminal — no app window, no Electron needed. It runs on a plain Node.js 26+ installation.
 
 ```bash
 # Full site mirror (default depth 3)
@@ -228,7 +232,7 @@ All three methods are configured per project under **Project Settings → Authen
 - **"No Chromium installation found" during a crawl** — Set the browser path manually in Settings (section above), make sure JS Rendering is enabled in the project's config, and save before starting.
 - **Tray icon not showing on Linux** — Your desktop environment must support the StatusNotifierItem/AppIndicator protocol (GNOME needs an extension such as AppIndicator support). Without it, closing the window will simply quit the app.
 - **Some pages look broken offline** — Sites loading assets from third-party domains may need *Domain Restriction* set to "Any domain" in the project filters so those assets get mirrored too.
-- **Build fails with a Node version warning** - This project targets Node.js 24 LTS; older versions are unsupported.
+- **Build fails with a Node version warning** - This project targets Node.js 26 LTS; older versions are unsupported.
 - **`npm run dev` fails with "Electron uninstall"** - Electron's binary was not downloaded. This can happen when npm's `allowScripts` blocks Electron's postinstall. Run `node node_modules/electron/install.js`, then retry `npm run dev`. The `allowScripts` entry for `electron@<version>` should also be present in `package.json`.
 - **"Update check failed" in Settings** — The app queries GitHub Releases; corporate proxies or rate limits can block it. Auto-update itself is unaffected once an installer is published.
 - **Auto-update doesn't trigger** — It only works for installed (packaged) builds published to GitHub Releases; dev builds skip it, and macOS builds must be signed and notarized.

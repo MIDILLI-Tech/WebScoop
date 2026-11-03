@@ -5,7 +5,9 @@ directories:
 files:
   - '!**/.vscode/*'
   - '!src/*'
-  - '!.githooks/*'
+  - '!.githooks/**'
+  - '!.github/**'
+  - '!screenshot.png'
   - '!scripts/*'
   - '!build/*'
   - '!electron.vite.config.*'

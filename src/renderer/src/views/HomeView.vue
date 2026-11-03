@@ -42,7 +42,7 @@
       <v-col cols="3">
         <v-card variant="tonal" color="primary" class="pa-2 text-center">
           <v-icon icon="mdi-folder-multiple" size="20" class="mb-1" />
-          <div class="text-h6 font-weight-bold">{{ projectStore.projects.length }}</div>
+          <div class="text-h6 font-weight-bold">{{ projects.length }}</div>
           <div class="text-caption">{{ t('home.totalProjects') }}</div>
         </v-card>
       </v-col>
@@ -104,12 +104,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '../stores/project-store'
+import { storeToRefs } from 'pinia'
 import { useDownloadStore } from '../stores/download-store'
 import logoUrl from '../assets/webscoop.png'
 
 const { t } = useI18n()
 const router = useRouter()
 const projectStore = useProjectStore()
+const { projects } = storeToRefs(projectStore)
 const downloadStore = useDownloadStore()
 
 const quickUrl = ref('https://')

@@ -336,7 +336,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingsStore } from '../stores/settings-store'
 import { useProjectStore } from '../stores/project-store'
@@ -372,7 +372,7 @@ const crawlActive = computed(
 
 const urlValid = computed(() => {
   try {
-    const u = new URL(form.url.trim())
+    const u = new URL(form.value.url.trim())
     return u.protocol === 'http:' || u.protocol === 'https:'
   } catch {
     return false
@@ -385,7 +385,7 @@ const savedSnapshot = ref('')
 const isDirty = ref(false)
 let liveSyncTimer: ReturnType<typeof setTimeout> | null = null
 
-const form = reactive({
+const form = ref({
   name: '',
   url: 'https://',
   baseDir: '',
@@ -429,18 +429,18 @@ const form = reactive({
 })
 
 const includePatterns = computed({
-  get: () => form.config.filters.includePatterns.join('\n'),
-  set: (val: string) => { form.config.filters.includePatterns = val.split('\n').filter(Boolean) }
+  get: () => form.value.config.filters.includePatterns.join('\n'),
+  set: (val: string) => { form.value.config.filters.includePatterns = val.split('\n').filter(Boolean) }
 })
 
 const excludePatterns = computed({
-  get: () => form.config.filters.excludePatterns.join('\n'),
-  set: (val: string) => { form.config.filters.excludePatterns = val.split('\n').filter(Boolean) }
+  get: () => form.value.config.filters.excludePatterns.join('\n'),
+  set: (val: string) => { form.value.config.filters.excludePatterns = val.split('\n').filter(Boolean) }
 })
 
 const authType = computed({
-  get: () => form.config.auth.type,
-  set: (val: string) => { form.config.auth.type = val }
+  get: () => form.value.config.auth.type,
+  set: (val: string) => { form.value.config.auth.type = val }
 })
 
 const domainOptions = computed(() => [
@@ -466,27 +466,27 @@ const presets = computed(() => [
 onMounted(async () => {
   const project = await projectStore.loadProject(props.projectId)
   if (project) {
-    form.name = project.name
-    form.url = project.url
+    form.value.name = project.name
+    form.value.url = project.url
     // Extract baseDir from existing outputDir (parent of project subfolder)
     if (project.outputDir) {
       const lastSep = Math.max(project.outputDir.lastIndexOf('/'), project.outputDir.lastIndexOf('\\'))
-      form.baseDir = lastSep > 0 ? project.outputDir.substring(0, lastSep) : project.outputDir
+      form.value.baseDir = lastSep > 0 ? project.outputDir.substring(0, lastSep) : project.outputDir
     }
     if (project.config) {
-      Object.assign(form.config, project.config)
+      Object.assign(form.value.config, project.config)
       // Convert maxFileSize from bytes to MB for display
-      form.config.maxFileSize = Math.round((project.config.maxFileSize || 104857600) / (1024 * 1024))
-      form.config.timeout = Math.round((project.config.timeout || 30000) / 1000)
-      if (project.config.auth) Object.assign(form.config.auth, project.config.auth)
-      if (project.config.filters) Object.assign(form.config.filters, project.config.filters)
+      form.value.config.maxFileSize = Math.round((project.config.maxFileSize || 104857600) / (1024 * 1024))
+      form.value.config.timeout = Math.round((project.config.timeout || 30000) / 1000)
+      if (project.config.auth) Object.assign(form.value.config.auth, project.config.auth)
+      if (project.config.filters) Object.assign(form.value.config.filters, project.config.filters)
     }
-    if (project.schedule) Object.assign(form.schedule, project.schedule)
+    if (project.schedule) Object.assign(form.value.schedule, project.schedule)
   }
 
   // Set default baseDir from settings if not set
-  if (!form.baseDir) {
-    form.baseDir = settingsStore.settings.defaultOutputDir || await window.api.getDownloadsPath()
+  if (!form.value.baseDir) {
+    form.value.baseDir = settingsStore.settings.defaultOutputDir || await window.api.getDownloadsPath()
   }
 
   // Use saved Chromium path first; only auto-detect if missing.
@@ -512,25 +512,25 @@ function sanitizeFolderName(name: string): string {
 
 /** Computed full output directory: baseDir / sanitized project name */
 const computedOutputDir = computed(() => {
-  if (!form.baseDir || !form.name) return ''
-  const sep = form.baseDir.includes('\\') ? '\\' : '/'
-  return form.baseDir + sep + sanitizeFolderName(form.name)
+  if (!form.value.baseDir || !form.value.name) return ''
+  const sep = form.value.baseDir.includes('\\') ? '\\' : '/'
+  return form.value.baseDir + sep + sanitizeFolderName(form.value.name)
 })
 
 function autoFillName(): void {
-  const normalizedName = (form.name || '').trim()
+  const normalizedName = (form.value.name || '').trim()
   const canAutoFill = !normalizedName || normalizedName === 'New Project' || normalizedName === 'Untitled Project'
-  if (!canAutoFill || !form.url) return
+  if (!canAutoFill || !form.value.url) return
   try {
-    const url = new URL(form.url)
-    form.name = url.hostname
+    const url = new URL(form.value.url)
+    form.value.name = url.hostname
   } catch { /* skip */ }
 }
 
 async function selectBaseDir(): Promise<void> {
   try {
     const dir = await window.api.selectDirectory()
-    if (dir) form.baseDir = dir
+    if (dir) form.value.baseDir = dir
   } catch (err) {
     console.error('Failed to select directory:', err)
   }
@@ -539,22 +539,22 @@ async function selectBaseDir(): Promise<void> {
 function applyPreset(key: string): void {
   switch (key) {
     case 'full':
-      form.config.maxDepth = 10
-      form.config.maxPages = 0
-      form.config.filters.includeExtensions = []
-      form.config.filters.excludeExtensions = []
+      form.value.config.maxDepth = 10
+      form.value.config.maxPages = 0
+      form.value.config.filters.includeExtensions = []
+      form.value.config.filters.excludeExtensions = []
       break
     case 'images':
-      form.config.maxDepth = 3
-      form.config.filters.includeExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp']
+      form.value.config.maxDepth = 3
+      form.value.config.filters.includeExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp']
       break
     case 'single':
       // Only the start page (plus its assets): cap page count AND depth.
-      form.config.maxDepth = 1
-      form.config.maxPages = 1
+      form.value.config.maxDepth = 1
+      form.value.config.maxPages = 1
       break
     case 'docs':
-      form.config.filters.includeExtensions = ['.html', '.htm', '.pdf', '.doc', '.docx', '.txt']
+      form.value.config.filters.includeExtensions = ['.html', '.htm', '.pdf', '.doc', '.docx', '.txt']
       break
   }
 }
@@ -570,7 +570,7 @@ async function detectChromium(): Promise<void> {
 }
 
 async function openLoginWindow(): Promise<void> {
-  const loginUrl = form.config.auth.loginUrl || form.url
+  const loginUrl = form.value.config.auth.loginUrl || form.value.url
   if (!loginUrl) return
   try {
     const cookies = await window.api.captureAuthCookies(loginUrl)
@@ -578,7 +578,7 @@ async function openLoginWindow(): Promise<void> {
       // Keep auth.type as-is: cookies are applied independently of the auth
       // type by the crawler, and switching to 'cookie' would yank the user
       // out of the form-login section before they see the success alert.
-      form.config.auth.cookies = cookies
+      form.value.config.auth.cookies = cookies
     }
   } catch (err) {
     console.error('Login window failed:', err)
@@ -587,9 +587,9 @@ async function openLoginWindow(): Promise<void> {
 
 function buildConfig(): any {
   return {
-    ...form.config,
-    maxFileSize: form.config.maxFileSize * 1024 * 1024,
-    timeout: form.config.timeout * 1000
+    ...form.value.config,
+    maxFileSize: form.value.config.maxFileSize * 1024 * 1024,
+    timeout: form.value.config.timeout * 1000
   }
 }
 
@@ -599,11 +599,11 @@ function serializeForIpc<T>(value: T): T {
 
 function buildSnapshot(): string {
   const snapshot = {
-    name: (form.name || '').trim(),
-    url: (form.url || '').trim(),
-    baseDir: (form.baseDir || '').trim(),
+    name: (form.value.name || '').trim(),
+    url: (form.value.url || '').trim(),
+    baseDir: (form.value.baseDir || '').trim(),
     config: serializeForIpc(buildConfig()),
-    schedule: serializeForIpc(form.schedule)
+    schedule: serializeForIpc(form.value.schedule)
   }
   return JSON.stringify(snapshot)
 }
@@ -628,9 +628,9 @@ function buildProjectPayload(): {
   config: any
   schedule: any
 } {
-  const name = form.name.trim()
-  const url = form.url.trim()
-  const baseDir = form.baseDir.trim()
+  const name = form.value.name.trim()
+  const url = form.value.url.trim()
+  const baseDir = form.value.baseDir.trim()
 
   if (!url) {
     throw new Error('Project URL is empty')
@@ -657,7 +657,7 @@ function buildProjectPayload(): {
     url,
     outputDir,
     config: serializeForIpc(buildConfig()),
-    schedule: serializeForIpc(form.schedule)
+    schedule: serializeForIpc(form.value.schedule)
   }
 }
 
@@ -695,17 +695,17 @@ watch(form, () => {
   emitUnsavedState()
 }, { deep: true })
 
-watch(() => form.url, () => {
-  const currentName = form.name.trim()
+watch(() => form.value.url, () => {
+  const currentName = form.value.name.trim()
   if (!currentName || currentName === 'New Project' || currentName === 'Untitled Project') {
     autoFillName()
   }
 })
 
 watch([
-  () => form.config.concurrency,
-  () => form.config.requestDelay,
-  () => form.config.downloadSpeedLimit
+  () => form.value.config.concurrency,
+  () => form.value.config.requestDelay,
+  () => form.value.config.downloadSpeedLimit
 ], () => {
   if (!formInitialized.value) return
   if (!downloadStore.isRunning(props.projectId) && !downloadStore.isPaused(props.projectId)) return
@@ -716,9 +716,9 @@ watch([
 
   liveSyncTimer = setTimeout(async () => {
     try {
-      await downloadStore.setConcurrency(props.projectId, form.config.concurrency)
-      await downloadStore.setRequestDelay(props.projectId, form.config.requestDelay)
-      await downloadStore.setDownloadSpeedLimit(props.projectId, form.config.downloadSpeedLimit)
+      await downloadStore.setConcurrency(props.projectId, form.value.config.concurrency)
+      await downloadStore.setRequestDelay(props.projectId, form.value.config.requestDelay)
+      await downloadStore.setDownloadSpeedLimit(props.projectId, form.value.config.downloadSpeedLimit)
     } catch (err: any) {
       saveError.value = err?.message || String(err)
     }
