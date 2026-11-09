@@ -56,7 +56,7 @@
     "postcss": "^8.5.30",
     "postcss-value-parser": "^4.2.0",
     "robots-parser": "^3.0.1",
-    "sass": "^1.105.2",
+    "sass": "^1.108.0",
     "tough-cookie": "^6.0.2",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
