@@ -61,7 +61,7 @@
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.2",
-    "undici": "^8.12.2",
+    "undici": "^8.12.4",
     "uuid": "^14.0.3",
     "vite": "^8.3.4",
     "vite-plugin-vuetify": "^2.1.3",
