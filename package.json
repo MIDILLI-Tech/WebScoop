@@ -30,7 +30,7 @@
     "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
-    "better-sqlite3": "^13.0.3",
+    "better-sqlite3": "^13.2.0",
     "electron-updater": "^6.8.9",
     "puppeteer-core": "^25.14.0"
   },
