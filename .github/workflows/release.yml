@@ -77,16 +77,52 @@ jobs:
       - name: Generate changelog
         run: npm run changelog -- --version="${{ steps.meta.outputs.version }}"
 
+      # Guard against a silently lost bump (a concurrent push/merge used to
+      # reset package.json to the previous version while the tag moved on).
+      - name: Verify bumped version
+        run: |
+          ACTUAL="$(node -p "require('./package.json').version")"
+          EXPECTED='${{ steps.meta.outputs.version }}'
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "::error::package.json version is '$ACTUAL' but expected '$EXPECTED'"
+            exit 1
+          fi
+          echo "package.json version: $ACTUAL"
+
       - name: Commit, tag and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json CHANGELOG.md
+          git add package.json package-lock.json CHANGELOG.md README.md
           git commit -m "chore(release): ${{ steps.meta.outputs.tag }} [skip ci]" \
             || echo "Nothing to commit"
-          git tag "${{ steps.meta.outputs.tag }}"
-          git push origin "HEAD:${{ github.ref_name }}"
-          git push origin "${{ steps.meta.outputs.tag }}"
+
+          BRANCH='${{ github.ref_name }}'
+          TAG='${{ steps.meta.outputs.tag }}'
+
+          # Rebase on the latest branch tip and retry: a plain push could be
+          # rejected, and resolving that merge by hand reverted the version
+          # bump once. The tag is only created after the commit is on the
+          # remote, so it always points at the released version.
+          for attempt in 1 2 3; do
+            git fetch origin
+            git rebase --autostash "origin/$BRANCH" || {
+              echo "::error::Rebase onto origin/$BRANCH failed"
+              exit 1
+            }
+            if git push origin "HEAD:$BRANCH"; then
+              git tag -f "$TAG"
+              if git push -f origin "$TAG"; then
+                echo "Pushed release commit and $TAG (attempt $attempt)"
+                exit 0
+              fi
+              echo "::error::Could not push tag $TAG"
+              exit 1
+            fi
+            echo "Push rejected (attempt $attempt) - retrying"
+          done
+          echo "::error::Could not push release commit after 3 attempts"
+          exit 1
 
   # ------------------------------------------------------------------
   # 2) Build installers for every OS and collect them as artifacts.
@@ -129,6 +165,20 @@ jobs:
         with:
           node-version: 26
           cache: npm
+
+      # Fail fast if the tag and package.json disagree: electron-builder takes
+      # the installer/update metadata version from package.json, so a mismatch
+      # publishes artifacts under the wrong version.
+      - name: Verify package.json matches the release tag
+        run: |
+          TAG='${{ needs.tag.outputs.tag || github.ref_name }}'
+          EXPECTED="${TAG#v}"
+          ACTUAL="$(node -p "require('./package.json').version")"
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "::error::package.json version is '$ACTUAL' but the tag is '$TAG'"
+            exit 1
+          fi
+          echo "Releasing $ACTUAL"
 
       # Full install (no --ignore-scripts) so the postinstall step
       # (`electron-builder install-app-deps`) rebuilds native modules

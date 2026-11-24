@@ -121,6 +121,21 @@ Artifacts are written to the `dist/` folder.
 
 Installers are published to GitHub Releases (see the `publish:` block in `electron-builder.yml`). Installed apps then pick them up automatically through electron-updater.
 
+### GitHub Actions (recommended)
+
+Run the **Release** workflow from the Actions tab and enter a version (e.g. `0.52.0`). It then:
+
+1. bumps `package.json` + `package-lock.json` (`npm version`, no local tag),
+2. regenerates the `CHANGELOG.md` section for that version,
+3. commits as `chore(release): v<version> [skip ci]` and pushes the `v<version>` tag,
+4. builds Windows / macOS / Linux installers and creates the GitHub Release.
+
+The tag job rebases on the latest branch tip before pushing (with retries) and verifies that `package.json` really contains the requested version, so a concurrent push can no longer revert the bump. The build job fails when the tag and `package.json` disagree, because electron-builder takes the published version from `package.json`.
+
+Pushing a tag by hand (`git tag v0.52.0 && git push origin v0.52.0`) still works, but bump `package.json` first — otherwise the build job stops with a version mismatch.
+
+### Manual (local) release
+
 ```bash
 # 1. Bump the version (updates package.json + package-lock.json and tags git)
 npm version patch   # or minor / major

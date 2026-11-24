@@ -12,6 +12,16 @@ updates:
       prefix: chore(deps)
     labels:
       - dependencies
+    # One weekly PR for all minor/patch bumps instead of one PR per package.
+    groups:
+      npm-minor-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+        exclude-patterns: ["typescript"]
+    ignore:
+      # TypeScript 7 is not supported by vue-tsc / typescript-eslint here yet.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
